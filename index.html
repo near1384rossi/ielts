@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="숫자듣기">
+<meta name="theme-color" content="#1f5fbf">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>IELTS 숫자 받아쓰기 연습</title>
+<style>
+:root{
+  --bg:#f6f5f2;--card:#ffffff;--ink:#1d1d1f;--muted:#6b6b70;--line:#e3e1dc;
+  --accent:#1f5fbf;--accent-ink:#fff;--ok:#1d7a46;--ok-bg:#e6f4ec;--bad:#b3261e;--bad-bg:#fbe9e7;--chip:#eef0f4;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#141416;--card:#1e1f22;--ink:#ececee;--muted:#9a9aa2;--line:#2f3035;
+  --accent:#5b8fe0;--accent-ink:#0d0d0f;--ok:#5fcf8f;--ok-bg:#16301f;--bad:#ff8a80;--bad-bg:#3a1c1a;--chip:#2a2c31;}
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Segoe UI",sans-serif;}
+.wrap{max-width:560px;margin:0 auto;padding:max(18px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(60px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left))}
+h1{font-size:22px;margin:6px 0 2px}
+.sub{color:var(--muted);font-size:14px;margin:0 0 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.card h2{font-size:15px;margin:0 0 10px;color:var(--muted);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--chip);color:var(--ink);border-radius:999px;padding:7px 12px;font-size:14px;cursor:pointer;user-select:none}
+.chip.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.row{margin-top:14px}
+.row label.t{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+select{width:100%;padding:9px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:15px}
+button{font:inherit;cursor:pointer}
+.btn{border:0;border-radius:12px;padding:13px 16px;font-size:16px;font-weight:600;background:var(--accent);color:var(--accent-ink);width:100%}
+.btn.sec{background:var(--chip);color:var(--ink);border:1px solid var(--line)}
+.btn:disabled{opacity:.4;cursor:default}
+.mini{display:flex;gap:8px}
+.mini .btn{flex:1}
+.hidden{display:none!important}
+.top{display:flex;justify-content:space-between;align-items:center;font-size:14px;color:var(--muted)}
+.bar{height:6px;background:var(--chip);border-radius:9px;margin:8px 0 14px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+.cat{font-weight:700;font-size:18px}
+.hint{font-size:13px;color:var(--muted);margin-top:2px}
+.play{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;margin:16px 0 10px;padding:22px;border-radius:16px;border:2px dashed var(--accent);background:transparent;color:var(--accent);font-size:18px;font-weight:700}
+.play:disabled{opacity:.35}
+.plays{font-size:12px;color:var(--muted);text-align:center;margin-top:-4px;margin-bottom:10px}
+input[type=text]{width:100%;font-size:22px;padding:12px 14px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink);letter-spacing:.5px}
+input[type=text]:focus{outline:none;border-color:var(--accent)}
+.fb{border-radius:12px;padding:12px 14px;margin-top:12px;font-size:15px}
+.fb.ok{background:var(--ok-bg);color:var(--ok)}
+.fb.bad{background:var(--bad-bg);color:var(--bad)}
+.fb b{font-size:18px}
+.script{margin-top:8px;color:var(--ink);font-size:14px;font-style:italic;opacity:.85}
+.score{font-size:40px;font-weight:800;text-align:center;margin:4px 0}
+table{width:100%;border-collapse:collapse;font-size:14px}
+td,th{padding:7px 4px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:600}
+.wrong{margin-top:12px}
+.wrong .w{border-top:1px solid var(--line);padding:10px 0;font-size:14px}
+.w .you{color:var(--bad)} .w .ans{color:var(--ok);font-weight:700}
+details summary{cursor:pointer;font-weight:600}
+details ul{padding-left:18px;margin:10px 0 0;font-size:14px}
+details li{margin-bottom:6px}
+.warn{background:var(--bad-bg);color:var(--bad);padding:10px 12px;border-radius:10px;font-size:14px;margin-bottom:14px}
+.small{font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🎧 IELTS 숫자 받아쓰기</h1>
+  <p class="sub">영국식 발음으로 숫자를 듣고 받아쓰세요. 실제 시험처럼 문장 속에 숫자가 섞여 나옵니다.</p>
+  <div id="noTTS" class="warn hidden">이 브라우저는 음성 재생(Speech Synthesis)을 지원하지 않습니다. Chrome·Safari 최신 버전에서 열어주세요.</div>
+
+  <!-- 설정 -->
+  <div id="setup">
+    <div class="card">
+      <h2>유형 선택 (여러 개 가능)</h2>
+      <div class="chips" id="cats"></div>
+      <div class="row">
+        <div class="mini">
+          <button class="btn sec" id="allOn" style="padding:8px;font-size:14px">전체 선택</button>
+          <button class="btn sec" id="allOff" style="padding:8px;font-size:14px">전체 해제</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>옵션</h2>
+      <div class="row" style="margin-top:0"><label class="t">문제 수</label>
+        <div class="chips" id="optN"></div></div>
+      <div class="row"><label class="t">말하기 속도</label>
+        <div class="chips" id="optRate"></div></div>
+      <div class="row"><label class="t">모드</label>
+        <div class="chips" id="optMode"></div>
+        <div class="small" style="margin-top:6px" id="modeDesc"></div></div>
+      <div class="row"><label class="t">음성 (영국식 en-GB 권장)</label>
+        <select id="voice"></select></div>
+    </div>
+    <button class="btn" id="start">시작하기</button>
+    <div id="hist" class="small" style="text-align:center;margin-top:10px"></div>
+  </div>
+
+  <!-- 문제 -->
+  <div id="quiz" class="card hidden">
+    <div class="top"><span id="prog">1 / 10</span><span id="sc">정답 0</span></div>
+    <div class="bar"><i id="barI"></i></div>
+    <div class="cat" id="qcat"></div>
+    <div class="hint" id="qhint"></div>
+    <button class="play" id="play">▶ 듣기</button>
+    <div class="plays" id="plays"></div>
+    <div class="mini" id="slowRow" style="margin-bottom:12px">
+      <button class="btn sec" id="slow" style="padding:9px;font-size:14px">🐢 천천히 다시</button>
+    </div>
+    <input type="text" id="ans" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="들은 내용을 입력">
+    <div style="margin-top:12px" class="mini">
+      <button class="btn" id="check">확인</button>
+      <button class="btn hidden" id="next">다음 ▶</button>
+    </div>
+    <div id="fb"></div>
+    <div style="text-align:right;margin-top:10px"><button class="btn sec" id="quit" style="width:auto;padding:6px 12px;font-size:13px">그만하기</button></div>
+  </div>
+
+  <!-- 결과 -->
+  <div id="result" class="card hidden">
+    <h2>결과</h2>
+    <div class="score" id="rScore"></div>
+    <div class="small" style="text-align:center;margin-bottom:12px" id="rSub"></div>
+    <table id="rTable"></table>
+    <div class="wrong" id="rWrong"></div>
+    <div class="mini" style="margin-top:14px">
+      <button class="btn sec" id="retryWrong">틀린 유형 다시</button>
+      <button class="btn" id="again">처음으로</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <details>
+      <summary>💡 IELTS 숫자 듣기 핵심 팁</summary>
+      <ul>
+        <li><b>double / triple</b>: "double seven" = 77, "triple oh" = 000</li>
+        <li><b>oh = 0</b>: 전화번호·시간·연도에서 0을 "oh"로 읽음 (7:05 = "seven oh five")</li>
+        <li><b>13 vs 30</b>: -teen은 뒤에 강세(thir<u>TEEN</u>), -ty는 앞에 강세(<u>THIR</u>ty). -ty는 끝 t가 약하게 'd'처럼 들림</li>
+        <li><b>가격</b>: "seven ninety-nine" = £7.99, "twelve hundred and fifty" = £1,250</li>
+        <li><b>날짜</b>: "the twenty-third of March" / "March the twenty-third" → 23 March (철자 정확히!)</li>
+        <li><b>시간</b>: "quarter to eight" = 7:45, "twenty-five past six" = 6:25</li>
+        <li><b>연도</b>: "nineteen oh eight" = 1908, "twenty fifteen" = 2015</li>
+        <li><b>말 바꾸기 함정</b>: "sorry, I mean…" 뒤에 나오는 마지막 정보가 정답</li>
+        <li>답안지에 <b>단위(£, %, m)</b>는 문제에 이미 있으면 다시 쓰지 않음</li>
+      </ul>
+    </details>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+// ---------- 유틸 ----------
+const ONES=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];
+const TENS=['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const MDAYS=[31,28,31,30,31,30,31,31,30,31,30,31];
+const rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const pad2=n=>String(n).padStart(2,'0');
+const digitsOf=s=>String(s).replace(/\D/g,'');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function words(n){
+  n=Math.floor(n);
+  if(n<20) return ONES[n];
+  if(n<100) return TENS[Math.floor(n/10)]+(n%10?'-'+ONES[n%10]:'');
+  if(n<1000){const r=n%100;return ONES[Math.floor(n/100)]+' hundred'+(r?' and '+words(r):'');}
+  if(n<1e6){const t=Math.floor(n/1000),r=n%1000;return words(t)+' thousand'+(r?(r<100?' and ':' ')+words(r):'');}
+  const m=Math.floor(n/1e6),r=n%1e6;return words(m)+' million'+(r?(r<100?' and ':' ')+words(r):'');
+}
+function ordinal(n){
+  const sp={1:'first',2:'second',3:'third',5:'fifth',8:'eighth',9:'ninth',12:'twelfth',20:'twentieth',30:'thirtieth'};
+  if(sp[n]) return sp[n];
+  if(n<20) return ONES[n]+'th';
+  return TENS[Math.floor(n/10)]+'-'+ordinal(n%10);
+}
+function decWords(v){
+  const s=String(v); const [i,f]=s.split('.');
+  let w=words(+i);
+  if(f) w+=' point '+f.split('').map(d=>ONES[+d]).join(' ');
+  return w;
+}
+function numFrom(input){
+  const m=String(input).replace(/,/g,'').match(/\d+(\.\d+)?|\.\d+/);
+  return m?parseFloat(m[0]):NaN;
+}
+
+// ---------- 문제 생성기 ----------
+const GEN={
+phone(){
+  let d='0'+pick(['7','7','1','2']);
+  while(d.length<11){ d+= (Math.random()<0.3?d[d.length-1]:String(rnd(0,9))); }
+  const groups=[d.slice(0,5),d.slice(5)];
+  const zero=Math.random()<0.8?'oh':'zero';
+  const dw=c=>c==='0'?zero:ONES[+c];
+  const spoken=groups.map(g=>{
+    const out=[];let i=0;
+    while(i<g.length){
+      let j=i;while(j<g.length&&g[j]===g[i])j++;
+      const run=j-i;
+      if(run>=3){out.push('triple '+dw(g[i]));i+=3;}
+      else if(run===2&&Math.random()<0.85){out.push('double '+dw(g[i]));i+=2;}
+      else{out.push(dw(g[i]));i++;}
+    }
+    return out.join(' ');
+  }).join(', ');
+  return {lead:pick(['My mobile number is','You can reach me on','The contact number is','Please call','The number is']),
+    core:spoken, answer:groups.join(' '), check:x=>digitsOf(x)===d, im:'tel'};
+},
+price(){
+  let value,core,answer;
+  if(Math.random()<0.65){
+    const p=rnd(1,199),pence=pick([0,50,99,25,75,95,rnd(11,98)]);
+    value=p+pence/100;
+    if(pence===0) core=words(p)+' pounds';
+    else{
+      const opts=[`${words(p)} pounds ${words(pence)}`,`${words(p)} pounds and ${words(pence)} pence`];
+      if(p<100) opts.push(`${words(p)} ${words(pence)}`);
+      core=pick(opts);
+    }
+    answer='£'+p+(pence?'.'+pad2(pence):'');
+  }else{
+    value=rnd(11,99)*100+pick([0,0,50,rnd(1,99)]);
+    if(value%1000>=100&&Math.random()<0.5){
+      const h=Math.floor(value/100),r=value%100;
+      core=words(h)+' hundred'+(r?' and '+words(r):'')+' pounds';
+    }else core=words(value)+' pounds';
+    answer='£'+value.toLocaleString('en-GB');
+  }
+  return {lead:pick(['The total comes to','It costs','The deposit is','That will be','The course fee is','A single room is']),
+    core, answer, check:x=>Math.abs(numFrom(x)-value)<0.001, im:'decimal'};
+},
+date(){
+  const mi=rnd(0,11),d=rnd(1,MDAYS[mi]),M=MONTHS[mi];
+  const core=Math.random()<0.6?`the ${ordinal(d)} of ${M}`:`${M} the ${ordinal(d)}`;
+  return {lead:pick(['The course starts on','The deadline is','I am arriving on','The party is on','Applications must be in by','The tour departs on']),
+    core, answer:`${d} ${M}`, im:'text',
+    check:x=>{
+      const s=x.toLowerCase();
+      const fi=MONTHS.findIndex(m=>new RegExp('\\b'+m.toLowerCase()+'\\b').test(s));
+      const nums=(s.match(/\d+/g)||[]).map(Number);
+      if(fi>=0) return fi===mi&&nums.includes(d);
+      const m2=s.match(/(\d+)\s*[\/.\-]\s*(\d+)/);
+      return !!m2&&+m2[1]===d&&+m2[2]===mi+1;
+    }};
+},
+time(){
+  const h=rnd(1,12),m=pick([0,5,10,15,20,25,30,35,40,45,50,55,rnd(1,59)]);
+  const nh=h===12?1:h+1;
+  const digital=words(h)+' '+(m===0?"o'clock":m<10?'oh '+words(m):words(m));
+  let core=digital;
+  if(m%5===0&&m!==0&&Math.random()<0.6){
+    if(m===15) core='quarter past '+words(h);
+    else if(m===30) core='half past '+words(h);
+    else if(m===45) core='quarter to '+words(nh);
+    else if(m<30) core=words(m)+' past '+words(h);
+    else core=words(60-m)+' to '+words(nh);
+  }
+  const ok=[`${h}${pad2(m)}`,`0${h}${pad2(m)}`,`${h+12}${pad2(m)}`];
+  if(m===0) ok.push(`${h}`,`${h+12}`);
+  return {lead:pick(['The train leaves at','Let us meet at','The lecture begins at','The shop closes at','Check-in is at','The bus arrives at']),
+    core, answer:`${h}:${pad2(m)}`, check:x=>ok.includes(digitsOf(x)), im:'decimal', hint:'예: 7:45 (24시간제도 정답 처리)'};
+},
+postcode(){
+  const L='ABCDEFGHJKLMNPRSTUWYZ',I='ABDEFGHJLNPQRSTUWXYZ';
+  const pat=pick(['A9','A99','AA9','AA99']);
+  const out=pat.split('').map(c=>c==='A'?pick(L):String(rnd(1,9))).join('');
+  const inn=String(rnd(0,9))+pick(I)+pick(I);
+  const sp=s=>s.split('').map(c=>/\d/.test(c)?ONES[+c]:c+'.').join(' ');
+  return {lead:pick(['The postcode is','It is','And the postcode, that is']),
+    core:sp(out)+' ... '+sp(inn), answer:out+' '+inn,
+    check:x=>x.toUpperCase().replace(/[^A-Z0-9]/g,'')===out+inn, im:'text', hint:'영국 우편번호 (예: CB2 8QX)'};
+},
+address(){
+  const n=rnd(2,450);
+  const st=pick(['Station Road','Church Street','Park Avenue','Mill Lane','Victoria Road','Queen Street','Green Lane','Hill Crescent','Bridge Street','Oak Drive','Elm Close','Market Square']);
+  let core;
+  if(n>=100&&Math.random()<0.5){const h=Math.floor(n/100),r=n%100;core=ONES[h]+' '+(r===0?'hundred':r<10?'oh '+ONES[r]:words(r));}
+  else core=words(n);
+  core+=' '+st;
+  const key=st.split(' ')[0].toLowerCase();
+  return {lead:pick(['I live at','The office is at','Please send it to','The hotel is at']),
+    core, answer:`${n} ${st}`, im:'text', hint:'번지 + 거리명',
+    check:x=>{const m=x.match(/\d+/);return !!m&&+m[0]===n&&x.toLowerCase().includes(key);}};
+},
+big(){
+  const t=pick(['year','year','large','million']);
+  if(t==='year'){
+    const y=rnd(1900,2029);let core;
+    if(y>=2000&&y<2010) core=y===2000?'two thousand':'two thousand and '+words(y-2000);
+    else if(y>=2010) core=Math.random()<0.6?'twenty '+words(y-2000):'two thousand and '+words(y-2000);
+    else{const r=y%100;core='nineteen '+(r===0?'hundred':r<10?'oh '+words(r):words(r));}
+    return {lead:pick(['The company was founded in','The building dates from','She moved here in','The museum opened in']),
+      core, answer:String(y), check:x=>digitsOf(x)===String(y), im:'decimal'};
+  }
+  if(t==='large'){
+    const v=Math.random()<0.5?rnd(1000,99999):rnd(100,9999)*10;
+    const [lead,tail]=pick([['The museum has','visitors a year'],['The stadium holds','people'],['The library has','books'],['Last year there were','applicants']]);
+    return {lead,core:words(v),tail,answer:v.toLocaleString('en-GB'),check:x=>digitsOf(x)===String(v),im:'decimal'};
+  }
+  const a=rnd(11,159)/10;
+  return {lead:pick(['The city has a population of','The project cost','Around']),core:decWords(a)+' million',
+    answer:`${a} million`,im:'text',hint:'예: 2.5 million 또는 2500000',
+    check:x=>{let v=numFrom(x);if(/m/i.test(x))v*=1e6;return Math.abs(v-a*1e6)<1;}};
+},
+decimal(){
+  const t=pick(['pct','pct','meas']);
+  if(t==='pct'){
+    const v=Math.random()<0.6?rnd(3,97):rnd(5,95)+0.5;
+    return {lead:pick(['Sales went up by','The success rate is','Prices fell by','Unemployment is now']),
+      core:decWords(v)+' per cent',answer:v+'%',check:x=>Math.abs(numFrom(x)-v)<1e-9,im:'decimal'};
+  }
+  const u=pick([['metres','m'],['kilometres','km'],['kilograms','kg'],['centimetres','cm'],['litres','L']]);
+  const v=Math.random()<0.5?rnd(11,99)/10:rnd(2,250);
+  return {lead:pick(['It measures','The total is','It is about','You will need']),
+    core:decWords(v)+' '+u[0],answer:`${v} ${u[1]}`,check:x=>Math.abs(numFrom(x)-v)<1e-9,im:'decimal'};
+},
+teenty(base,which){
+  base=base||rnd(3,9);
+  const v=which==null?(Math.random()<0.5?10+base:base*10):(which?10+base:base*10);
+  const [lead,tail]=pick([['The room number is',''],['There were','people at the meeting'],['The group has','members'],['Please turn to page',''],['It is bus number',''],['The class lasts','minutes'],['She is','years old']]);
+  return {lead,core:words(v),tail,answer:String(v),check:x=>digitsOf(x)===String(v),im:'decimal',
+    hint:'강세 주의: -TEEN(뒤) vs -ty(앞)',_base:base,_teen:v<20};
+},
+correction(){
+  const k=pick(['price','date','time','teenty','teenty','phone']);
+  let a=GEN[k](),b;
+  if(k==='teenty') b=GEN.teenty(a._base,!a._teen);
+  else{ do{b=GEN[k]();}while(b.answer===a.answer); }
+  const fix=pick(['... sorry, I mean','... no, wait, it is','... actually, no, it is','... oh, sorry, I got that wrong, it is']);
+  return {lead:a.lead,core:a.core+fix+' '+b.core,tail:a.tail,answer:b.answer,check:b.check,im:b.im,
+    hint:'마지막에 정정된 정보를 쓰세요'};
+}
+};
+
+const CATS=[
+ ['phone','전화번호','double·triple·oh 주의'],
+ ['price','가격','£ 금액 (예: £7.99, £1,250)'],
+ ['date','날짜','예: 23 March (월 철자 정확히)'],
+ ['time','시간','예: 7:45'],
+ ['postcode','우편번호','영국 우편번호 (예: CB2 8QX)'],
+ ['address','주소','번지 + 거리명'],
+ ['big','연도·큰 수','연도, 인원수, million'],
+ ['decimal','소수·%·단위','숫자만 맞으면 정답'],
+ ['teenty','13 vs 30','강세 주의: -TEEN(뒤) vs -ty(앞)'],
+ ['correction','말 바꾸기 함정','마지막에 정정된 정보를 쓰세요']
+];
+const CATNAME=Object.fromEntries(CATS.map(c=>[c[0],c[1]]));
+
+// ---------- 저장 ----------
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
+
+// ---------- 설정 UI ----------
+const $=id=>document.getElementById(id);
+const saved=store.get('ielts_num_cfg',{});
+const cfg={cats:new Set(saved.cats||CATS.map(c=>c[0])),n:saved.n||10,rate:saved.rate||1,mode:saved.mode||'practice',voice:saved.voice||''};
+
+function chipGroup(el,items,isOn,onClick){
+  el.innerHTML='';
+  items.forEach(([val,label])=>{
+    const b=document.createElement('span');b.className='chip'+(isOn(val)?' on':'');b.textContent=label;
+    b.onclick=()=>{onClick(val);render();};el.appendChild(b);
+  });
+}
+function render(){
+  chipGroup($('cats'),CATS,v=>cfg.cats.has(v),v=>{cfg.cats.has(v)?cfg.cats.delete(v):cfg.cats.add(v);});
+  chipGroup($('optN'),[[10,'10문제'],[20,'20문제'],[30,'30문제']],v=>cfg.n===v,v=>cfg.n=v);
+  chipGroup($('optRate'),[[0.8,'느리게'],[1,'보통 (시험)'],[1.15,'빠르게']],v=>cfg.rate===v,v=>cfg.rate=v);
+  chipGroup($('optMode'),[['practice','연습'],['exam','실전']],v=>cfg.mode===v,v=>cfg.mode=v);
+  $('modeDesc').textContent=cfg.mode==='exam'?'실전: 한 번만 들을 수 있어요 (실제 IELTS처럼)':'연습: 몇 번이든 다시 듣고 천천히 듣기 가능';
+  $('start').disabled=cfg.cats.size===0;
+  const h=store.get('ielts_num_hist',{t:0,c:0});
+  $('hist').textContent=h.t?`누적 ${h.t}문제 · 정답률 ${Math.round(h.c/h.t*100)}%`:'';
+}
+$('allOn').onclick=()=>{CATS.forEach(c=>cfg.cats.add(c[0]));render();};
+$('allOff').onclick=()=>{cfg.cats.clear();render();};
+
+// ---------- 음성 ----------
+const tts=window.speechSynthesis;
+let voices=[];
+function loadVoices(){
+  if(!tts) return;
+  voices=tts.getVoices().filter(v=>/^en/i.test(v.lang));
+  voices.sort((a,b)=>(b.lang==='en-GB')-(a.lang==='en-GB'));
+  const sel=$('voice');sel.innerHTML='';
+  if(!voices.length){sel.innerHTML='<option value="">기본 영어 음성</option>';return;}
+  voices.forEach(v=>{const o=document.createElement('option');o.value=v.name;o.textContent=`${v.name} (${v.lang})`;sel.appendChild(o);});
+  if(cfg.voice&&voices.some(v=>v.name===cfg.voice)) sel.value=cfg.voice;
+}
+if(!tts){$('noTTS').classList.remove('hidden');}
+else{loadVoices();tts.onvoiceschanged=loadVoices;}
+$('voice').onchange=e=>{cfg.voice=e.target.value;};
+
+function speak(text,rate){
+  if(!tts) return;
+  try{
+    tts.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    const v=voices.find(x=>x.name===$('voice').value);
+    if(v) u.voice=v;
+    u.lang=v?v.lang:'en-GB';
+    u.rate=rate;
+    tts.speak(u);
+  }catch(e){}
+}
+
+// ---------- 퀴즈 ----------
+let Q=[],idx=0,results=[],plays=0,checked=false;
+function textOf(it){return `${it.lead} ${it.core}${it.tail?' '+it.tail:''}.`;}
+function build(cats,n){
+  const list=[...cats];const arr=[];
+  for(let i=0;i<n;i++){const c=list[i%list.length];const it=GEN[c]();it.cat=c;arr.push(it);}
+  for(let i=arr.length-1;i>0;i--){const j=rnd(0,i);[arr[i],arr[j]]=[arr[j],arr[i]];}
+  return arr;
+}
+function startQuiz(cats){
+  store.set('ielts_num_cfg',{cats:[...cfg.cats],n:cfg.n,rate:cfg.rate,mode:cfg.mode,voice:$('voice').value});
+  Q=build(cats,cfg.n);idx=0;results=[];
+  $('setup').classList.add('hidden');$('result').classList.add('hidden');$('quiz').classList.remove('hidden');
+  show(true);
+}
+function show(autoplay){
+  const it=Q[idx];checked=false;plays=0;
+  $('prog').textContent=`${idx+1} / ${Q.length}`;
+  $('sc').textContent=`정답 ${results.filter(r=>r.ok).length}`;
+  $('barI').style.width=(idx/Q.length*100)+'%';
+  $('qcat').textContent=CATNAME[it.cat];
+  $('qhint').textContent=it.hint||CATS.find(c=>c[0]===it.cat)[2];
+  $('ans').value='';$('ans').disabled=false;$('ans').setAttribute('inputmode',it.im==='tel'?'tel':it.im==='decimal'?'decimal':'text');
+  $('fb').innerHTML='';
+  $('check').classList.remove('hidden');$('next').classList.add('hidden');
+  $('slowRow').classList.toggle('hidden',cfg.mode==='exam');
+  $('play').disabled=false;
+  updPlays();
+  if(autoplay) doPlay(cfg.rate);
+}
+function updPlays(){
+  $('plays').textContent=cfg.mode==='exam'?(plays?'재생 완료 (실전 모드: 1회)':'실전 모드: 1회만 재생'):(plays?`${plays}회 재생`:'');
+  if(cfg.mode==='exam'&&plays>=1&&!checked) $('play').disabled=true;
+}
+function doPlay(rate){
+  if(cfg.mode==='exam'&&plays>=1&&!checked) return;
+  speak(textOf(Q[idx]),rate);plays++;updPlays();
+}
+$('play').onclick=()=>doPlay(cfg.rate);
+$('slow').onclick=()=>doPlay(0.7);
+function check(){
+  if(checked) return;
+  const it=Q[idx],v=$('ans').value.trim();
+  if(!v){$('ans').focus();return;}
+  const ok=!!it.check(v);checked=true;
+  results.push({it,input:v,ok});
+  $('ans').disabled=true;$('play').disabled=false;
+  $('fb').innerHTML=`<div class="fb ${ok?'ok':'bad'}">${ok?'✅ 정답!':'❌ 오답'} &nbsp;<b>${esc(it.answer)}</b>
+    ${ok?'':`<div style="margin-top:4px">내 답: ${esc(v)}</div>`}
+    <div class="script">"${esc(textOf(it))}"</div></div>`;
+  $('check').classList.add('hidden');$('next').classList.remove('hidden');
+  $('sc').textContent=`정답 ${results.filter(r=>r.ok).length}`;
+  const h=store.get('ielts_num_hist',{t:0,c:0});h.t++;if(ok)h.c++;store.set('ielts_num_hist',h);
+  updPlays();
+}
+function next(){
+  if(idx<Q.length-1){idx++;show(true);}
+  else finish();
+}
+$('check').onclick=check;$('next').onclick=next;
+$('ans').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();checked?next():check();}});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&checked&&document.activeElement!==$('ans')&&!$('quiz').classList.contains('hidden')){e.preventDefault();next();}});
+$('quit').onclick=()=>{if(tts)tts.cancel();results.length?finish():backHome();};
+
+function finish(){
+  if(tts) tts.cancel();
+  $('quiz').classList.add('hidden');$('result').classList.remove('hidden');
+  const c=results.filter(r=>r.ok).length,t=results.length;
+  $('rScore').textContent=`${c} / ${t}`;
+  $('rSub').textContent=`정답률 ${t?Math.round(c/t*100):0}%`;
+  const by={};results.forEach(r=>{by[r.it.cat]=by[r.it.cat]||{t:0,c:0};by[r.it.cat].t++;if(r.ok)by[r.it.cat].c++;});
+  $('rTable').innerHTML='<tr><th>유형</th><th>정답</th><th>정답률</th></tr>'+
+    Object.entries(by).map(([k,v])=>`<tr><td>${CATNAME[k]}</td><td>${v.c}/${v.t}</td><td>${Math.round(v.c/v.t*100)}%</td></tr>`).join('');
+  const wr=results.filter(r=>!r.ok);
+  $('rWrong').innerHTML=wr.length?'<h2 style="margin-top:6px">틀린 문제 (탭하면 다시 듣기)</h2>'+wr.map((r,i)=>
+    `<div class="w" data-i="${i}" style="cursor:pointer">🔊 <b>${CATNAME[r.it.cat]}</b> · 정답 <span class="ans">${esc(r.it.answer)}</span> · 내 답 <span class="you">${esc(r.input)}</span>
+     <div class="script">"${esc(textOf(r.it))}"</div></div>`).join(''):'<div style="text-align:center">🎉 모두 정답!</div>';
+  $('rWrong').querySelectorAll('.w').forEach(el=>el.onclick=()=>speak(textOf(wr[+el.dataset.i].it),cfg.rate));
+  $('retryWrong').classList.toggle('hidden',!wr.length);
+  $('retryWrong').onclick=()=>startQuiz(new Set(wr.map(r=>r.it.cat)));
+  $('barI').style.width='100%';
+}
+function backHome(){
+  $('quiz').classList.add('hidden');$('result').classList.add('hidden');$('setup').classList.remove('hidden');render();
+}
+$('again').onclick=backHome;
+$('start').onclick=()=>startQuiz(cfg.cats);
+render();
+})();
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}
+</script>
+</body>
+</html>
